@@ -37,10 +37,12 @@ function PageRegistration() {
     const [login, setLogin] = useRecoilState(accountState);
     const [loading, setLoading] = useRecoilState(loadingState);
     const [state, setState] = useState({
-        login: {
+        register: {
             hasError: false,
             message: "",
-        }
+            statusCode: 0,
+        },
+        isPasswordMatched: true,
     });
     const account = useRecoilValue(accountState);
     const navigate = useNavigate();
@@ -51,38 +53,45 @@ function PageRegistration() {
     const blurWidth = useBreakpointValue({ base: '100%', md: '40vw', lg: '30vw' });
     const blurZIndex = useBreakpointValue({ base: -1, md: -1, lg: 0 });
 
+
+
     const onSubmit = async (data) => {
-        console.log(data)
+        const { email, password, confirm } = data;
+        if (password !== confirm) return setState(prevState => ({
+            ...prevState,
+            isPasswordMatched: false
+        }));
+
         setLoading(true);
-        let login = await authController.register({
-            email: data.email,
-            password: data.password
-        });
+        let login = await authController.register({ email, password });
+
         setLoading(false);
         setLogin(login);
 
-        if (login == 400) {
-            setTimeout(function () {
-                setState({
-                    login: {
-                        hasError: true,
-                        message: "Invalid email and/or password"
-                    }
-                })
-            }, 1000);
+        if (login == 400) return setTimeout(function () {
+            setState(prevState => ({
+                ...prevState,
+                isPasswordMatched: true,
+                register: {
+                    hasError: true,
+                    message: `An account with ${email} is already registered, Please try logging in.`,
+                    statusCode: 400,
+                }
+            }))
+        }, 1000);
 
+        if (login == 500) return setTimeout(function () {
+            setState(prevState => ({
+                ...prevState,
+                isPasswordMatched: true,
+                register: {
+                    hasError: true,
+                    message: "Sorry, something went wrong. It's not you, It's us",
+                    statusCode: 500,
 
-        }
-        if (login == 500) {
-            setTimeout(function () {
-                setState({
-                    login: {
-                        hasError: true,
-                        message: "Sorry, something went wrong. It's not you, It's us"
-                    }
-                })
-            }, 1000);
-        }
+                }
+            }))
+        }, 1000);
     }
 
     const handleNavigate = () => {
@@ -110,13 +119,14 @@ function PageRegistration() {
     };
 
     const registerConfirm = {
-        ...register("password", {
+        ...register("confirm", {
             required: {
                 value: true,
                 message: "Confirm Password is required"
             }
         })
     };
+
     const emailError = errors.email && <Alert status='error' borderRadius={"lg"}>
         <AlertIcon />
         {errors.email.message}
@@ -132,13 +142,23 @@ function PageRegistration() {
         {errors.password.message}
     </Alert>;
 
-    const loginError = state.login.hasError == true ? <ScaleFade
+    const passwordNotMatched = !state.isPasswordMatched && <ScaleFade
         initialScale={0.6}
-        in={state.login.hasError}>
+        in={true}>
 
         <Alert status='error' borderRadius={"lg"}>
             <AlertIcon />
-            <AlertDescription>{state.login.message} </AlertDescription>
+            <AlertDescription>Password not matched</AlertDescription>
+        </Alert>
+    </ScaleFade>;
+
+    const loginError = state.register.hasError == true ? <ScaleFade
+        initialScale={0.6}
+        in={state.register.hasError}>
+
+        <Alert status='error' borderRadius={"lg"}>
+            <AlertIcon />
+            <AlertDescription>{state.register.message} </AlertDescription>
         </Alert>
     </ScaleFade> : <></>;
 
@@ -250,22 +270,32 @@ function PageRegistration() {
                         <FormControl isInvalid={errors.name}>
                             <Box mt={10}>
                                 <Stack spacing={4}>
-                                    <Input
-                                        id="email"
-                                        isInvalid={state.login.hasError || errors.email}
-                                        placeholder="example@email.com"
-                                        bg={'gray.100'}
-                                        border={0}
-                                        color={'gray.500'}
-                                        _placeholder={{
-                                            color: 'gray.500',
-                                        }}
-                                        {...registerEmail} />
+                                    <Tooltip
+                                        color={"white"}
+                                        backgroundColor={"red"}
+                                        hasArrow
+                                        label='Email already exist'
+                                        placement='left'
+                                        isOpen={state.register.statusCode == 400}>
+
+
+                                        <Input
+                                            id="email"
+                                            isInvalid={state.register.hasError || errors.email}
+                                            placeholder="example@email.com"
+                                            bg={'gray.100'}
+                                            border={0}
+                                            color={'gray.500'}
+                                            _placeholder={{
+                                                color: 'gray.500',
+                                            }}
+                                            {...registerEmail} />
+                                    </Tooltip>
                                     {emailError}
                                     <Input
                                         id="password"
 
-                                        isInvalid={state.login.hasError || errors.password}
+                                        isInvalid={state.register.hasError || errors.password}
                                         type={"password"}
                                         placeholder="Password"
                                         bg={'gray.100'}
@@ -280,7 +310,7 @@ function PageRegistration() {
                                     <Input
                                         id="confirm"
 
-                                        isInvalid={state.login.hasError || errors.password}
+                                        isInvalid={state.register.hasError || errors.password}
                                         type={"password"}
                                         placeholder="Confirm"
                                         bg={'gray.100'}
@@ -291,7 +321,7 @@ function PageRegistration() {
                                         }}
                                         {...registerConfirm} />
                                     {confirmError}
-
+                                    {passwordNotMatched}
                                     {loginError}
                                 </Stack>
                                 <Button

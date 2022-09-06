@@ -30,9 +30,6 @@ import { useNavigate } from "react-router-dom";
 import { Authentication } from '../../controllers/authenticaiton';
 import { accountState, loadingState } from '../../state/recoilState';
 
-
-
-
 function PageLogin() {
     const authController = new Authentication();
     const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm();
@@ -55,37 +52,27 @@ function PageLogin() {
     const blurZIndex = useBreakpointValue({ base: -1, md: -1, lg: 0 });
 
     const onSubmit = async (data) => {
-        console.log(data)
+        const { email, password } = data;
         setLoading(true);
-        let login = await authController.login({
-            email: data.email,
-            password: data.password
-        });
+        let login = await authController.login({ email, password });
         setLoading(false);
         setLogin(login);
 
-        if (login == 400) {
-            setTimeout(function () {
-                setState({
-                    login: {
-                        hasError: true,
-                        message: "Invalid email and/or password"
-                    }
-                })
-            }, 1000);
+        if (login == 400) return setState(prevState => ({
+            ...prevState,
+            login: {
+                hasError: true,
+                message: "Invalid email and/or password"
+            }
+        }));
 
-
-        }
-        if (login == 500) {
-            setTimeout(function () {
-                setState({
-                    login: {
-                        hasError: true,
-                        message: "Sorry, something went wrong. It's not you, It's us"
-                    }
-                })
-            }, 1000);
-        }
+        if (login == 500) return setState(prevState => ({
+            ...prevState,
+            login: {
+                hasError: true,
+                message: "Sorry, something went wrong. It's not you, It's us"
+            }
+        }));
     }
 
     const handleNavigate = () => {

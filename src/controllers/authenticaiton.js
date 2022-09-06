@@ -27,7 +27,8 @@ class Authentication {
             });
             return response;
         } catch (error) {
-            console.log(error);
+            if (error.response.status == 400) return 400;
+            return 500;
         }
     }
 
