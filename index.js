@@ -5,6 +5,7 @@ const multer = require("multer");
 const mongoose = require("mongoose");
 const cors = require('cors')
 const app = express();
+const cookieParser = require('cookie-parser')
 
 const { fileFilter, storage } = require("./services/img-upload/fileFilter");
 
@@ -14,7 +15,8 @@ try {
     .then(() => console.log("SERVER IS CONNECTED"))
     .catch(() => console.log("SERVER CANNOT CONNECT"));
 
-  app.use(cors())
+  app.use(cors({ origin: true, credentials: true}));
+  app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(multer({ storage, fileFilter }).array("images"));
