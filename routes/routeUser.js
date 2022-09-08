@@ -35,7 +35,7 @@ router.put("/user/change-password",
             .withMessage("Password must have at least 1 special character")
     ], (req, res) => user.changePassword(req, res));
 
-router.post("/replace/http-only", () => {
+router.post("/replace/http-only", (req, res) => {
     return res
         .status(200)
         .cookie('token', null, {})
