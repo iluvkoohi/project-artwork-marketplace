@@ -36,13 +36,10 @@ router.put("/user/change-password",
     ], (req, res) => user.changePassword(req, res));
 
 router.post("/replace/http-only", (req, res) => {
-
     return res
         .status(200)
         .cookie('token', "token_replaced", { httpOnly: true, maxAge: 0.001, sameSite: "none", secure: true })
-        .json({
-            message: "Cookie  replaced"
-        })
+        .json({ message: "Success" })
 });
 
 module.exports = router;
