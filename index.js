@@ -21,7 +21,7 @@ try {
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
     next();
   });
-  app.use(cors());
+  app.use(cors({ origin: true, credentials: true}));
   app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
