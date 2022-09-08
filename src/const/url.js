@@ -1,5 +1,5 @@
 
-const baseUrl = "https://api-artworkmarketplace.herokuapp.com";
+const baseUrl = "https://project-artwork-marketplace.vercel.app";
 const avatars = [
     {
         "name": "Kolya Madridano",

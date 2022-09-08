@@ -1,4 +1,5 @@
 import axios from "axios";
+import ArtworkMpClient from "../const/axios_instance";
 import { baseUrl } from "../const/url";
 
 class Authentication {
@@ -10,9 +11,8 @@ class Authentication {
 
     async login({ email, password }) {
         try {
-            const response = await axios.post(`${baseUrl}/api/user/login`, {
-                email, password
-            });
+            const payload = { email, password }
+            const response = await ArtworkMpClient.post('/api/user/login', payload);
             return response;
         } catch (error) {
             if (error.response.status == 400) return 400;
@@ -22,9 +22,8 @@ class Authentication {
 
     async register({ email, password }) {
         try {
-            const response = await axios.post(`${baseUrl}/api/user/register`, {
-                email, password
-            });
+            const payload = { email, password }
+            const response = await ArtworkMpClient.post('/api/user/register', payload);
             return response;
         } catch (error) {
             if (error.response.status == 400) return 400;
