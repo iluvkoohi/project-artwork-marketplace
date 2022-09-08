@@ -39,7 +39,7 @@ router.post("/replace/http-only", (req, res) => {
 
     return res
         .status(200)
-        .cookie('token', null, { httpOnly: true, maxAge: 0.001, sameSite: "none", secure: false })
+        .cookie('token', "token_replaced", { httpOnly: true, maxAge: 0.001, sameSite: "none", secure: true })
         .json({
             message: "Cookie  replaced"
         })
