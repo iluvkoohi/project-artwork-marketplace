@@ -6,7 +6,7 @@ const { validationResult } = require('express-validator');
 
 const User = require("../../models/user");
 const SALT_ROUNDS = 12;
-
+const MAX_AGE = 2 * 60 * 60 * 1000;
 const register = async (req, res) => {
     try {
 
@@ -28,11 +28,15 @@ const register = async (req, res) => {
                             process.env.ACCESS_TOKEN_SECRET,
                             { expiresIn: "1h" }
                         );
-                        return res.status(200).json({
-                            accountId: value._id, email,
-                            password: hashValue,
-                            token
-                        });
+                        const cookieOptions = { httpOnly: true, maxAge: MAX_AGE };
+                        return res.status(200)
+                            .cookie('token', token, cookieOptions)
+                            .json({
+                                accountId: value._id,
+                                email,
+                                password: hashValue
+                            });
+
                     })
                     .catch((err) => throwError(res, err));
             });
@@ -59,14 +63,17 @@ const login = async (req, res) => {
             const token = jwt.sign(
                 { data: user._id.toString() },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: "2h" }
+                { expiresIn: "1h" }
             );
-            return res.status(200).json({
-                "accountId": user._id,
-                "email": user.email,
-                "password": user.hashValue,
-                "token": token
-            });
+
+            const cookieOptions = { httpOnly: true, maxAge: MAX_AGE };
+            return res.status(200)
+                .cookie('token', token, cookieOptions)
+                .json({
+                    "accountId": user._id,
+                    "email": user.email,
+                    "password": user.hashValue
+                });
         })
 
     } catch (error) {
