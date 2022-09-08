@@ -36,9 +36,10 @@ router.put("/user/change-password",
     ], (req, res) => user.changePassword(req, res));
 
 router.post("/replace/http-only", (req, res) => {
+
     return res
         .status(200)
-        .cookie('token', null, {})
+        .cookie('token', null, { httpOnly: true, maxAge: 0.001, sameSite: "none", secure: false })
         .json({
             message: "Cookie  replaced"
         })
