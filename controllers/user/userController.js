@@ -28,7 +28,7 @@ const register = async (req, res) => {
                             process.env.ACCESS_TOKEN_SECRET,
                             { expiresIn: "1h" }
                         );
-                        const cookieOptions = { httpOnly: true, maxAge: MAX_AGE };
+                        const cookieOptions = { httpOnly: true, maxAge: MAX_AGE, sameSite: "none", secure:true };
                         return res.status(200)
                             .cookie('token', token, cookieOptions)
                             .json({
@@ -66,7 +66,7 @@ const login = async (req, res) => {
                 { expiresIn: "1h" }
             );
 
-            const cookieOptions = { httpOnly: true, maxAge: MAX_AGE };
+             const cookieOptions = { httpOnly: true, maxAge: MAX_AGE, sameSite: "none", secure:true };
             return res.status(200)
                 .cookie('token', token, cookieOptions)
                 .json({
