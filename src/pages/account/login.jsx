@@ -18,7 +18,8 @@ import {
     AlertDescription,
     useDisclosure,
     ScaleFade,
-    FormControl
+    FormControl,
+    useColorMode
 } from '@chakra-ui/react';
 
 
@@ -29,6 +30,8 @@ import { Blur } from '../../const/components';
 import { useNavigate } from "react-router-dom";
 import { Authentication } from '../../controllers/authenticaiton';
 import { accountState, loadingState } from '../../state/recoilState';
+
+
 
 function PageLogin() {
     const authController = new Authentication();
@@ -45,6 +48,7 @@ function PageLogin() {
     const account = useRecoilValue(accountState);
     const navigate = useNavigate();
 
+    const { colorMode, toggleColorMode } = useColorMode();
     const size = useBreakpointValue({ base: 'md', md: 'lg' });
     const width = useBreakpointValue({ base: '44px', md: '60px' })
     const height = useBreakpointValue({ base: '44px', md: '60px' });
@@ -57,7 +61,6 @@ function PageLogin() {
         let login = await authController.login({ email, password });
         setLoading(false);
         setLogin(login);
-
 
         if (login == 400) return setState(prevState => ({
             ...prevState,
@@ -74,9 +77,11 @@ function PageLogin() {
                 message: "Sorry, something went wrong. It's not you, It's us"
             }
         }));
+
         navigate("/artist/main",
             { replace: true }
         );
+
     }
 
     const handleNavigate = () => {
@@ -102,12 +107,12 @@ function PageLogin() {
         })
     };
 
-    const emailError = errors.email && <Alert status='error' borderRadius={"lg"}>
+    const emailError = errors.email && <Alert status='error' borderRadius={"lg"} color={"black"}>
         <AlertIcon />
         {errors.email.message}
     </Alert>;
 
-    const passwordError = errors.password && <Alert status='error' borderRadius={"lg"}>
+    const passwordError = errors.password && <Alert status='error' borderRadius={"lg"} color={"black"}>
         <AlertIcon />
         {errors.password.message}
     </Alert>;
@@ -116,7 +121,7 @@ function PageLogin() {
         initialScale={0.6}
         in={state.login.hasError}>
 
-        <Alert status='error' borderRadius={"lg"}>
+        <Alert status='error' borderRadius={"lg"} color={"black"}>
             <AlertIcon />
             <AlertDescription>{state.login.message} </AlertDescription>
         </Alert>
@@ -229,8 +234,6 @@ function PageLogin() {
                     <form onSubmit={handleSubmit(onSubmit)} >
                         <FormControl isInvalid={errors.name}>
                             <Box mt={10}>
-
-
                                 <Stack spacing={4}>
                                     <Input
                                         id="email"
@@ -258,8 +261,8 @@ function PageLogin() {
                                         }}
                                         {...registerPassword} />
                                     {passwordError}
-
                                     {loginError}
+
 
                                 </Stack>
                                 <Button

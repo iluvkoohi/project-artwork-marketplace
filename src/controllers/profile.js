@@ -9,5 +9,13 @@ class Profile {
             return error.response.status;
         }
     }
+    async create(data) {
+        try {
+            const response = await ArtworkMpClient.post('/api/profile', data);
+            return response;
+        } catch (error) {
+            return error.response.status;
+        }
+    }
 }
 export { Profile }

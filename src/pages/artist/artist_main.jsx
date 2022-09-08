@@ -1,26 +1,43 @@
 import React, { useEffect } from 'react'
-import { Profile } from '../../controllers/profile'
+import { Authentication } from '../../controllers/authenticaiton';
 import { useNavigate } from "react-router-dom";
+import NavbarArtist from './artist_components/navbar';
+import { useRecoilState } from 'recoil';
+import { loadingState } from '../../state/recoilState';
+import { Profile } from '../../controllers/profile';
 
 export default function PageArtistMain() {
-    const profileController = new Profile();
     const navigate = useNavigate();
+    const [loading, setLoading] = useRecoilState(loadingState);
 
-    const getProfile = async () => {
-        const response = await profileController.get();
+    const accountController = new Authentication();
+    const profileController = new Profile();
+
+    const logout = async () => {
+        setLoading(true);
+        await accountController.logout();
+        navigate("/", { replace: true });
+        setLoading(false);
     }
 
-    const anotherFuction = () => {
-        console.log("anotherFuction()");
+    const getOwnProfile = async () => {
+        const response = await profileController.get();
+        if (response.data === undefined) {
+            return navigate("/artist/profile/edit", { replace: true });
+        }
     }
 
     useEffect(() => {
-        getProfile();
-        anotherFuction();
-        return () => { }
+        getOwnProfile();
+
+        return () => {
+
+        }
     }, [])
 
-    return (
-        <div>PageArtistMain</div>
-    )
+    return <>
+        <NavbarArtist
+            title={"Artwork Marketplace"}
+            logout={() => logout()} />
+    </>
 }

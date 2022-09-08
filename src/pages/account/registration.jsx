@@ -92,6 +92,10 @@ function PageRegistration() {
                 }
             }))
         }, 1000);
+
+        navigate("/artist/main",
+            { replace: true }
+        );
     }
 
     const handleNavigate = () => {
@@ -127,36 +131,36 @@ function PageRegistration() {
         })
     };
 
-    const emailError = errors.email && <Alert status='error' borderRadius={"lg"}>
+    const emailError = errors.email && <Alert status='error' borderRadius={"lg"} color={"black"}>
         <AlertIcon />
         {errors.email.message}
     </Alert>;
 
-    const passwordError = errors.password && <Alert status='error' borderRadius={"lg"}>
+    const passwordError = errors.password && <Alert status='error' borderRadius={"lg"} color={"black"}>
         <AlertIcon />
         {errors.password.message}
     </Alert>;
 
-    const confirmError = errors.password && <Alert status='error' borderRadius={"lg"}>
+    const confirmError = errors.confirm && <Alert status='error' borderRadius={"lg"} color={"black"}>
         <AlertIcon />
-        {errors.password.message}
+        {errors.confirm.message}
     </Alert>;
 
     const passwordNotMatched = !state.isPasswordMatched && <ScaleFade
         initialScale={0.6}
         in={true}>
 
-        <Alert status='error' borderRadius={"lg"}>
+        <Alert status='error' borderRadius={"lg"} color={"black"}>
             <AlertIcon />
             <AlertDescription>Password not matched</AlertDescription>
         </Alert>
     </ScaleFade>;
 
-    const loginError = state.register.hasError == true ? <ScaleFade
+    const registrationError = state.register.hasError == true ? <ScaleFade
         initialScale={0.6}
         in={state.register.hasError}>
 
-        <Alert status='error' borderRadius={"lg"}>
+        <Alert status='error' borderRadius={"lg"} color={"black"}>
             <AlertIcon />
             <AlertDescription>{state.register.message} </AlertDescription>
         </Alert>
@@ -322,7 +326,7 @@ function PageRegistration() {
                                         {...registerConfirm} />
                                     {confirmError}
                                     {passwordNotMatched}
-                                    {loginError}
+                                    {registrationError}
                                 </Stack>
                                 <Button
                                     fontFamily={'heading'}
