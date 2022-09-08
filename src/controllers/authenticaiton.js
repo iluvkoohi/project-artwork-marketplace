@@ -26,8 +26,7 @@ class Authentication {
             const response = await ArtworkMpClient.post('/api/user/register', payload);
             return response;
         } catch (error) {
-            if (error.response.status == 400) return 400;
-            return 500;
+            return error.response.status;
         }
     }
 

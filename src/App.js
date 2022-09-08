@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { loadingState } from './state/recoilState';
 import { useRecoilValue } from 'recoil';
 
@@ -10,9 +10,15 @@ import { SyncLoader } from 'react-spinners';
 import PageArtistMain from './pages/artist/artist_main';
 import PagePlayground from './pages/artist/playground';
 
+
+const PrivateRoute = ({ component: Compontent, authenticated }) => {
+  return authenticated ? <Compontent /> : <Navigate to="/" />;
+}
+
 function App() {
   const loading = useRecoilValue(loadingState);
   const loadingRef = React.createRef(null);
+
   return (
     <LoadingOverlay
       active={loading}
@@ -22,7 +28,8 @@ function App() {
         <Routes>
           <Route path="/" element={<PageLogin />} />
           <Route path="/registration" element={<PageRegistration />} />
-          <Route path="/artist/main" element={<PageArtistMain />} />
+
+          <Route path="/artist/main" element={<PrivateRoute authenticated={false} component={PageArtistMain} />} />
           <Route path="/playground" element={<PagePlayground />} />
         </Routes>
       </div>
