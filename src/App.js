@@ -8,6 +8,7 @@ import PageRegistration from './pages/account/registration';
 import LoadingOverlay from 'react-loading-overlay-ts';
 import { SyncLoader } from 'react-spinners';
 import PageArtistMain from './pages/artist/artist_main';
+import PagePlayground from './pages/artist/playground';
 
 function App() {
   const loading = useRecoilValue(loadingState);
@@ -22,7 +23,7 @@ function App() {
           <Route path="/" element={<PageLogin />} />
           <Route path="/registration" element={<PageRegistration />} />
           <Route path="/artist/main" element={<PageArtistMain />} />
-
+          <Route path="/playground" element={<PagePlayground />} />
         </Routes>
       </div>
     </LoadingOverlay>

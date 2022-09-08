@@ -42,6 +42,15 @@ class Authentication {
         }
     }
 
+    async logout() {
+        try {
+            const response = await ArtworkMpClient.post('/api/replace/http-only');
+            console.log(response.data);
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
 
 export {

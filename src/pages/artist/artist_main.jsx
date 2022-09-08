@@ -9,13 +9,9 @@ export default function PageArtistMain() {
         console.log(response.data)
     }
     useEffect(() => {
-
         getProfile();
-        return () => {
-
-        }
+        return () => { }
     }, [])
-
 
     return (
         <div>PageArtistMain</div>
