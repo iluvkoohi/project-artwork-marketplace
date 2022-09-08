@@ -58,6 +58,7 @@ function PageLogin() {
         setLoading(false);
         setLogin(login);
 
+
         if (login == 400) return setState(prevState => ({
             ...prevState,
             login: {
@@ -73,6 +74,9 @@ function PageLogin() {
                 message: "Sorry, something went wrong. It's not you, It's us"
             }
         }));
+        navigate("/artist/main",
+            { replace: true }
+        );
     }
 
     const handleNavigate = () => {

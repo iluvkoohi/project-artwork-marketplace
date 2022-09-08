@@ -1,9 +1,9 @@
 import axios from "axios";
-import { baseUrl } from "./url";
 
 const ArtworkMpClient = axios.create({
-    baseURL: baseUrl,
+    baseURL: process.env.REACT_APP_BASE_URL,
     timeout: 9000,
+    withCredentials: true,
     headers: {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',

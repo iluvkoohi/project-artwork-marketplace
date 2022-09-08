@@ -2,6 +2,7 @@
   "name": "artwork-marketplace-web",
   "version": "0.1.0",
   "private": true,
+  "proxy": "https://project-artwork-marketplace-276zd1g26-iluvkoohi.vercel.app",
   "dependencies": {
     "@chakra-ui/react": "^2.3.1",
     "@emotion/react": "^11.10.4",
@@ -10,6 +11,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
     "axios": "^0.27.2",
+    "dotenv": "^16.0.2",
     "framer-motion": "^6.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
