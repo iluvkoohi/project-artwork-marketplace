@@ -120,7 +120,7 @@ const updateProfile = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return throwError(res, errors.array());
 
-    const { name, contact, birthdate } = req.body;
+    const { name, contact, birthdate, address } = req.body;
     const accountId = req.user.data;
     const query = { accountId };
     const update = {
@@ -130,6 +130,9 @@ const updateProfile = async (req, res) => {
         birthdate,
         "contact.number": contact.number,
         "contact.email": contact.email,
+        "address.name": address.name,
+        "address.coordinates.latitude": address.coordinates.latitude,
+        "address.coordinates.longitude": address.coordinates.longitude,
         "date.updatedAt": Date.now(),
       },
     };
