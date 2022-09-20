@@ -186,10 +186,8 @@ const updateArtImages = async (req, res) => {
 }
 
 const remove = (req, res) => {
-    const accountId = req.user.data;
-    const { _id } = req.body;
-
-    return Art.findOneAndDelete({ accountId, _id })
+    const _id = req.params.id;
+    return Art.findByIdAndDelete(_id)
         .then((value) => {
             if (!value) return throwError(res, { message: "failed" });
             return res.status(200).json({ message: "success" });
