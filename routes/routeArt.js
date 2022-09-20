@@ -57,7 +57,7 @@ router.put("/art/update/image",
     updateArtImagesValidator,
     (req, res) => art.updateArtImages(req, res));
 
-router.delete("/art",
+router.delete("/art/:id",
     isAuthenticated,
     (req, res) => art.remove(req, res));
 
