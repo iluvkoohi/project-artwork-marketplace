@@ -124,12 +124,13 @@ const updateArt = async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return throwError(res, errors.array());
 
-        const { _id, title, description, availability } = req.body;
+        const { _id, title, description, availability, price } = req.body;
         const update = {
             $set: {
                 title,
                 description,
                 availability,
+                price,
                 "date.updatedAt": Date.now(),
             },
         };
