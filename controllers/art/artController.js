@@ -124,13 +124,16 @@ const updateArt = async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return throwError(res, errors.array());
 
-        const { _id, title, description, availability, price } = req.body;
+        const { _id, title, description, availability, price, tags } = req.body;
+         tags = JSON.parse(tags)
+          tags = tags.filter((item, pos) => tags.indexOf(item) == pos)
         const update = {
             $set: {
                 title,
                 description,
                 availability,
                 price,
+                tags,
                 "date.updatedAt": Date.now(),
             },
         };
