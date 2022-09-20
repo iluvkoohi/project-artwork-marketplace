@@ -189,9 +189,6 @@ const remove = (req, res) => {
     const accountId = req.user.data;
     const { _id } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(_id))
-        return throwError(res, { message: "_id pattern is invalid" });
-
     return Art.findOneAndDelete({ accountId, _id })
         .then((value) => {
             if (!value) return throwError(res, { message: "failed" });
