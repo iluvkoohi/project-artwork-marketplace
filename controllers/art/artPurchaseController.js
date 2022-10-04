@@ -6,6 +6,7 @@ const { Profile } = require("../../models/profile");
 const { validationResult } = require('express-validator');
 const { throwError } = require("../../const/status");
 const { v4: uuidv4 } = require('uuid');
+const { emptyAvatar } = require('../../const/urls');
 
 const MONETIZATION_PERCENT = 0.12;
 
@@ -74,12 +75,12 @@ const art = (req, res) => {
                         "customer": {
                             accountId: customerProfile.accountId,
                             name: customerProfile.name,
-                            avatar: customerProfile.avatar ??= emptyAvatar
+                            avatar: customerProfile.avatar ?? emptyAvatar
                         },
                         "artist": {
                             accountId: artistProfile.accountId,
                             name: artistProfile.name,
-                            avatar: artistProfile.avatar ??= emptyAvatar
+                            avatar: artistProfile.avatar ?? emptyAvatar
                         }
                     },
                     art: { _id, title, description, price }
