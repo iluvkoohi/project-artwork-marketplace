@@ -74,12 +74,12 @@ const art = (req, res) => {
                         "customer": {
                             accountId: customerProfile.accountId,
                             name: customerProfile.name,
-                            avatar: customerProfile.avatar
+                            avatar: customerProfile.avatar ??= emptyAvatar
                         },
                         "artist": {
                             accountId: artistProfile.accountId,
                             name: artistProfile.name,
-                            avatar: artistProfile.avatar
+                            avatar: artistProfile.avatar ??= emptyAvatar
                         }
                     },
                     art: { _id, title, description, price }
