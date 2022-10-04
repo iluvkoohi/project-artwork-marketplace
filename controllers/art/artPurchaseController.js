@@ -63,12 +63,12 @@ const art = (req, res) => {
                     },
                 }, { new: true })
 
-                const monetization = await TxnMonetization({
+                const monetization = await new TxnMonetization({
                     transactionId,
                     amount: monetizationAmt
                 }).save();
 
-                const billing = await Billing({
+                const billing = await new Billing({
                     transactionId,
                     header: {
                         "customer": {
