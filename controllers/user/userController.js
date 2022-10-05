@@ -7,6 +7,13 @@ const { validationResult } = require('express-validator');
 const User = require("../../models/user");
 const SALT_ROUNDS = 12;
 const MAX_AGE = 2 * 60 * 60 * 1000;
+const cookieOptions = {
+    httpOnly: true,
+    maxAge: MAX_AGE,
+    sameSite: process.env.NODE_ENV === 'production' && "none",
+    secure: process.env.NODE_ENV === 'production',
+};
+
 const register = async (req, res) => {
     try {
 
@@ -28,7 +35,6 @@ const register = async (req, res) => {
                             process.env.ACCESS_TOKEN_SECRET,
                             { expiresIn: "1h" }
                         );
-                        const cookieOptions = { httpOnly: true, maxAge: MAX_AGE, sameSite: "none", secure:true };
                         return res.status(200)
                             .cookie('token', token, cookieOptions)
                             .json({
@@ -66,7 +72,6 @@ const login = async (req, res) => {
                 { expiresIn: "1h" }
             );
 
-             const cookieOptions = { httpOnly: true, maxAge: MAX_AGE, sameSite: "none", secure:true };
             return res.status(200)
                 .cookie('token', token, cookieOptions)
                 .json({
