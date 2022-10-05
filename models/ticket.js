@@ -12,9 +12,13 @@ const VerificationSchema = new Schema({
         type: mongoose.SchemaTypes.ObjectId,
         required: [true, "accountId is required"],
     },
-    img: {
+    photoUrl: {
         type: String,
-        required: [true, "img is required"],
+        required: [true, "Photo url is required"],
+    },
+    profile: {
+        type: {},
+        required: [true, "Profile is required"],
     },
     date: {
         createdAt: {
@@ -28,7 +32,7 @@ const VerificationSchema = new Schema({
     status: {
         type: String,
         enum: ["pending", "completed", "rejected"],
-        required: [true, "status is required"],
+        default: "pending",
     },
 }, options);
 

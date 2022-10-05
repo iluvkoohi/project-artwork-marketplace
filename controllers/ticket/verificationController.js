@@ -15,7 +15,10 @@ const create = async (req, res) => {
         if (ticket)
             return throwError(res, { message: "cannot re-submit ticket" });
 
-        const profile = await Profile.findOne({ accountId });
+        const profile = await Profile
+            .findOne({ accountId })
+            .select({ __v: 0, _id: 0, accountId: 0, account: 0, gallery: 0 });
+
         if (profile == null)
             return throwError(res, { message: "Profile not found" });
 
@@ -34,8 +37,9 @@ const create = async (req, res) => {
             break;
         }
 
-        req.body.img = urls[0];
+        req.body.photoUrl = urls[0];
         req.body.accountId = accountId;
+        req.body.profile = profile;
         return new Verification(req.body)
             .save()
             .then((value) => res.status(200).json(value))
