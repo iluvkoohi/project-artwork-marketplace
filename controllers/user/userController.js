@@ -33,7 +33,7 @@ const register = async (req, res) => {
                         const token = jwt.sign(
                             { data: value._id.toString() },
                             process.env.ACCESS_TOKEN_SECRET,
-                            { expiresIn: "1h" }
+                            { expiresIn: "7d" }
                         );
                         return res.status(200)
                             .cookie('token', token, cookieOptions)
@@ -69,7 +69,7 @@ const login = async (req, res) => {
             const token = jwt.sign(
                 { data: user._id.toString() },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: "1h" }
+                { expiresIn: "7d" }
             );
 
             return res.status(200)
