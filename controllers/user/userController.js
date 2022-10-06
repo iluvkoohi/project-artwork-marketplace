@@ -6,7 +6,7 @@ const { validationResult } = require('express-validator');
 
 const User = require("../../models/user");
 const SALT_ROUNDS = 12;
-const MAX_AGE = 2 * 60 * 60 * 1000;
+const MAX_AGE = 60 * 60 * 24 * 7;
 const cookieOptions = {
     httpOnly: true,
     maxAge: MAX_AGE,
@@ -115,6 +115,8 @@ const changePassword = async (req, res) => {
         console.log(error);
     }
 }
+
+
 
 module.exports = {
     register,
