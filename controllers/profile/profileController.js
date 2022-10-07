@@ -123,6 +123,8 @@ const updateProfile = async (req, res) => {
     const { name, contact, birthdate, address } = req.body;
     const accountId = req.user.data;
     const query = { accountId };
+
+
     const update = {
       $set: {
         "name.first": name.first,
@@ -130,9 +132,6 @@ const updateProfile = async (req, res) => {
         birthdate,
         "contact.number": contact.number,
         "contact.email": contact.email,
-        "address.name": address.name,
-        "address.coordinates.latitude": address.coordinates.latitude,
-        "address.coordinates.longitude": address.coordinates.longitude,
         "date.updatedAt": Date.now(),
       },
     };
@@ -143,9 +142,12 @@ const updateProfile = async (req, res) => {
         if (!value) return throwError(res, { message: "Update failed" });
         return res.status(200).json(value);
       })
-      .catch((err) => throwError(res, err));
+      .catch((err) => {
+        throwError(res, err)
+      });
 
   } catch (error) {
+    console.log(error)
     return throwError(res, error);
   }
 };
