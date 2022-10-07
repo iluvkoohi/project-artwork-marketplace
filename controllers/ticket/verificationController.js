@@ -60,7 +60,7 @@ const all = (req, res) => {
                 .then((value) => res.status(200).json(value))
                 .catch((err) => throwError(res, err));
         }
-        return Verification.find({ status })
+        return Verification.find({})
             .sort({ createdAt: -1 }) // filter by date
             .select({ __v: 0 }) // Do not return _id and __v
             .then((value) => res.status(200).json(value))
