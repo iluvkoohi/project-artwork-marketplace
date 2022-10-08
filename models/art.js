@@ -49,7 +49,6 @@ const ArtSchema = new Schema({
         required: [true, "description is required"],
     },
     images: [ImageSchema],
-    tags: [String],
     date: {
         createdAt: {
             type: Date,
