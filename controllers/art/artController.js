@@ -11,7 +11,7 @@ const create = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return throwError(res, errors.array());
 
-    let { description, tags, title, price, address, latitude, longitude } = req.body;
+    let { description,  title, price, address, latitude, longitude } = req.body;
 
     const accountId = req.user.data;
     const exclude = { _id: 0, __v: 0, date: 0, contact: 0, gallery: 0, name: 0, accountId: 0, avatar: 0 };
@@ -29,14 +29,9 @@ const create = async (req, res) => {
     };
     const images = [];
     const files = req.files;
-    tags = JSON.parse(tags)
-    tags = tags.filter((item, pos) => tags.indexOf(item) == pos)
 
     if (files.length <= 0) return throwError(res, { message: "The allowed minimum of images is 1." });
     if (files.length > 5) return throwError(res, { message: "The allowed maximum of images is 5." });
-    if (tags == undefined) return throwError(res, { message: "Tags is required" });
-    if (tags.length < 2) return throwError(res, { message: "The allowed minimum of tags is 2." });
-    if (tags.length > 5) return throwError(res, { message: "The allowed maximum of tags is 5." });
 
     for (const file of files) {
         const { path } = file;
@@ -52,7 +47,6 @@ const create = async (req, res) => {
     return new Art({
         accountId,
         images,
-        tags,
         title,
         description,
         price: parseFloat(price),
