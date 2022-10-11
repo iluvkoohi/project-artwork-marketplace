@@ -1,0 +1,35 @@
+.progressVisualFull {
+    display: flex;
+    height: 4px;
+}
+
+.progressVisualPart {
+    /* Number of the seconds for complete animation */
+    transition: width 1s;
+}
+
+.progressLabel {
+    /* Nothing here, move along */
+    font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #eee;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgba(87, 87, 87, 0.8);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #212838;
+}

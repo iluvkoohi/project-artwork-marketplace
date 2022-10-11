@@ -18,28 +18,40 @@ import {
     Stack,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { useNavigate } from 'react-router-dom';
+import emptyAvatar from "../../../images/empty-avatar.jpg";
+import { useRecoilValue } from 'recoil';
+import { profileState as atomProfileState } from '../../../state/recoilState';
 
-const Links = ['Dashboard', 'Projects', 'Team'];
+const links = [
+    { name: 'Sell', path: '/artist/artwork' },
+    { name: 'Orders', path: '/artist/artwork' }
+];
 
-const NavLink = ({ children }) => (
-    <Link
+const NavLink = (props) => {
+    const { title, action } = props;
+
+    return < Link
         px={2}
         py={1}
         rounded={'md'}
+        fontWeight={"normal"}
+        fontSize={"sm"}
+        color={"gray.400"}
+        onClick={action}
         _hover={{
             textDecoration: 'none',
             bg: useColorModeValue('gray.200', 'gray.700'),
-        }}
-        href={'#'}>
-        {children}
-    </Link>
-);
-
+        }}>
+        {title}
+    </Link >;
+}
 function NavbarArtist(props) {
     const { logout, title } = props;
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { colorMode, toggleColorMode } = useColorMode();
-
+    const profileValue = useRecoilValue(atomProfileState)
+    const navigate = useNavigate();
     return (
         <>
             <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -52,13 +64,20 @@ function NavbarArtist(props) {
                         onClick={isOpen ? onClose : onOpen}
                     />
                     <HStack spacing={8} alignItems={'center'}>
-                        <Box>{title}</Box>
+                        <Box
+                            fontWeight={"medium"}
+                            color={"gray.500"}
+                            cursor={"pointer"}
+                            onClick={() => navigate("/artist/main", { replace: true })}>{title}</Box>
                         <HStack
                             as={'nav'}
                             spacing={4}
                             display={{ base: 'none', md: 'flex' }}>
-                            {Links.map((link) => (
-                                <NavLink key={link}>{link}</NavLink>
+                            {links.map((value) => (
+                                <NavLink
+                                    key={value.name}
+                                    title={value.name}
+                                    action={() => navigate(value.path, { replace: true })}></NavLink>
                             ))}
                         </HStack>
                     </HStack>
@@ -70,12 +89,7 @@ function NavbarArtist(props) {
                                 variant={'link'}
                                 cursor={'pointer'}
                                 minW={0}>
-                                <Avatar
-                                    size={'sm'}
-                                    src={
-                                        'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                                    }
-                                />
+                                <Avatar size={'sm'} src={profileValue?.avatar ? profileValue?.avatar : emptyAvatar} />
                             </MenuButton>
                             <MenuList>
 
@@ -95,9 +109,8 @@ function NavbarArtist(props) {
                                         </Box>
                                     }
                                 </MenuItem>
-                                <MenuItem>Account Settings</MenuItem>
-                                <MenuItem>Profile Settings</MenuItem>
                                 <MenuDivider />
+                                <MenuItem onClick={() => navigate('/artist/profile/update', { replace: true })}>Account Settings</MenuItem>
                                 <MenuItem onClick={logout}>Sign out</MenuItem>
                             </MenuList>
                         </Menu>
@@ -107,7 +120,7 @@ function NavbarArtist(props) {
                 {isOpen ? (
                     <Box pb={4} display={{ md: 'none' }}>
                         <Stack as={'nav'} spacing={4}>
-                            {Links.map((link) => (
+                            {links.map((link) => (
                                 <NavLink key={link}>{link}</NavLink>
                             ))}
                         </Stack>
@@ -115,7 +128,6 @@ function NavbarArtist(props) {
                 ) : null}
             </Box>
 
-            <Box p={4}>Main Content Here</Box>
         </>
     );
 }

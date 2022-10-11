@@ -17,5 +17,21 @@ class Profile {
             return error.response.status;
         }
     }
+    async update(data) {
+        try {
+            const response = await ArtworkMpClient.put('/api/profile', data);
+            return response;
+        } catch (error) {
+            return error.response.status;
+        }
+    }
+    async updateAvatar(data) {
+        try {
+            const response = await ArtworkMpClient.put('/api/profile/avatar', data);
+            return response;
+        } catch (error) {
+            return error.response.status;
+        }
+    }
 }
 export { Profile }

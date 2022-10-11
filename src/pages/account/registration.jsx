@@ -113,12 +113,22 @@ function PageRegistration() {
         })
     };
 
+    var pattern = new RegExp(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d][A-Za-z\d!@#$%^&*()_+]{7,19}$/);
+
     const registerPassword = {
         ...register("password", {
             required: {
                 value: true,
                 message: "Password is required"
-            }
+            },
+            pattern: {
+                value: pattern,
+                message: "Password must contain at least 1 number, 1 special character and SHOULD NOT start with a special character"
+            },
+            minLength: {
+                value: 10,
+                message: "Password minimum length is 10"
+            },
         })
     };
 
@@ -286,7 +296,7 @@ function PageRegistration() {
                                         <Input
                                             id="email"
                                             isInvalid={state.register.hasError || errors.email}
-                                            placeholder="example@email.com"
+                                            placeholder="Email"
                                             bg={'gray.100'}
                                             border={0}
                                             color={'gray.500'}

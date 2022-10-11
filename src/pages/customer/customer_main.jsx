@@ -1,16 +1,24 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Authentication } from '../../controllers/authenticaiton';
 import { useLoaderData, useNavigate, useNavigation } from "react-router-dom";
-import NavbarArtist from './artist_components/navbar';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { loadingState as atomLoadingState } from '../../state/recoilState';
 import { Profile } from '../../controllers/profile';
 import { profileState as atomProfileState, selectedArtState as atomSelectedArtState } from "../../state/recoilState";
-import { Box, Flex, Progress, Spinner, Wrap, WrapItem, Image, useDisclosure, Button, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogCloseButton, AlertDialogBody, AlertDialogFooter, Input, Textarea, FormControl, FormLabel, Switch, InputGroup, InputLeftElement, Text, InputRightElement, Spacer, useToast } from '@chakra-ui/react';
+import { Box, Flex, Progress, Spinner, Wrap, WrapItem, Image, useDisclosure, Button, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogCloseButton, AlertDialogBody, AlertDialogFooter, Input, Textarea, FormControl, FormLabel, Switch, InputGroup, InputLeftElement, Text, InputRightElement, Spacer, useToast, Tooltip } from '@chakra-ui/react';
 import { Art } from '../../controllers/art';
 import { useForm } from 'react-hook-form';
+import { RiMapPin2Line } from "react-icons/ri"
+import axios from 'axios';
+import { formatter } from '../../utils/formatters';
 
-export default function PageArtistMain() {
+const GEOCODE = 'https://maps.googleapis.com/maps/api/geocode/json';
+const MAP_API = 'AIzaSyC7g-EssrekE1IDnmsC0K8FkrxBztfpw9w';
+const STRIPE_KEY = 'sk_test_51Lize7DbhTM8s4NtDpmRR7iPcppW41EG2AYCHLmJjopgdCnUUP85FQVvmEt98rCnpnr59xQd6zOP7D4kfkMDXqKM00ejfzOuph';
+
+
+export default function PageCustomerMain() {
+    // const stripe = new Stripe(STRIPE_KEY);
     const accountController = new Authentication();
     const profileController = new Profile();
     const artController = new Art();
@@ -37,28 +45,51 @@ export default function PageArtistMain() {
     }
 
     const getArts = async (accountId) => {
-        const response = await artController.getByArtists({ accountId });
-        console.log("getArts() response -> ", response.data);
-        setArts(response.data);
+        const coordinates = new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                if (position) {
+                    resolve({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    });
+                }
+            })
+        });
+
+        await coordinates
+            .then(async value => {
+                const { latitude, longitude } = value;
+
+                const response = await artController.getNearbyArts({
+                    latitude,
+                    longitude
+                });
+
+                console.log({ latitude, longitude })
+                console.log("getArts() response -> ", response.data);
+                setArts(response.data);
+            })
+            .catch(err => { console.log(err) });
+
+
+
     }
 
 
     useEffect(() => {
         if (loader.data === undefined)
-            return navigate("/artist/profile/create", { replace: true });
+            return navigate("/customer/profile/create", { replace: true });
         getArts(loader.data.accountId);
         setProfileState(loader.data);
     }, []);
 
 
     return <React.Fragment>
-        <NavbarArtist
-            title={"Artworks"}
-            logout={() => logout()} />
+
         {navigation.state === "loading" ? Loading() : <></>}
 
         <Box px={{ base: "5", sm: "20", md: "0", lg: "0", xl: "36" }} pt={20}>
-            <Wrap justify={{ base: "center", md: "start", lg: "start" }}>
+            <Wrap justify={{ base: "center", md: "start", lg: "start" }} spacing={'5'}>
                 {arts?.map((value) => {
                     return <WrapItem
                         cursor={"pointer"}
@@ -66,16 +97,22 @@ export default function PageArtistMain() {
                             setSelectedArt(value);
                             onOpen();
                         }}
+
                         key={value._id}>
-                        <Box >
-                            <Image
-                                src={value.images[0].url}
-                                alt={value.images[0].url}
-                                fit={"cover"}
-                                height={"60"}
-                                width={"80"}
-                                borderRadius={"md"} />
-                        </Box>
+                        <Tooltip label={value.title} hasArrow>
+                            <Box >
+                                <Image
+                                    src={value.images[0].url}
+                                    alt={value.images[0].url}
+                                    fit={"cover"}
+                                    height={"60"}
+                                    width={"80"}
+                                    borderRadius={"md"} />
+                                <Text color={"gray.600"} mt={2} width={"80"} textOverflow={"ellipsis"} noOfLines={1}>{value.title} </Text>
+                                <Text color={"gray.500"} fontSize={"sm"}>{formatter.format(value?.price)}</Text>
+                                <Text color={"gray.500"} fontSize={"sm"} lineHeight={1.1}>{value.distanceBetween}</Text>
+                            </Box>
+                        </Tooltip>
                     </WrapItem>;
                 })}
 
@@ -166,43 +203,13 @@ export default function PageArtistMain() {
                                 height={{ base: null, md: "500px", lg: "500px" }} />
                         </Box>
                         <Box mt={{ base: "5", md: "0", lg: "0" }} width={{ base: "full", md: "60%", lg: "60%" }}>
-                            <Input
-                                placeholder='Write title...'
-                                {...register("title", { required: true })} />
-                            <InputGroup mt={"2"}>
-                                <InputLeftElement
-                                    maxLength={"3"}
-                                    pointerEvents='none'
-                                    children={<Text>₱</Text>} />
-                                <Input
-                                    type={"number"}
-                                    placeholder={"Price"}
-                                    {...register("price", { required: true })} />
-                                <InputRightElement children={<Text>.00</Text>} />
-                            </InputGroup>
-                            <Textarea
-                                mt={"2"}
-                                placeholder='Say something about this art...'
-                                rows={"10"}
-                                {...register("description", { required: true })}></Textarea>
-
-                            {/* <FormControl display='flex' alignItems='center' mt={"5"} ml={2}>
-                                <FormLabel htmlFor='email-alerts' mb='0' fontWeight={"normal"}>
-                                    Artwork Visibility
-                                </FormLabel>
-                                <Switch id='email-alerts' isChecked={selectedArt?.availability} />
-                            </FormControl> */}
+                            <Text fontSize={"2xl"}>{selectedArt?.title}</Text>
+                            <Text>{selectedArt?.description}</Text>
+                            <Text mt={5}>{formatter.format(selectedArt?.price)}</Text>
                         </Box>
                     </Flex>
                 </AlertDialogBody>
                 <AlertDialogFooter>
-                    <Button
-                        color={"red"}
-                        onClick={() => onDeleteArt(selectedArt?._id)}
-                        isLoading={toggleDeleting}>
-                        Delete
-                    </Button>
-                    <Spacer />
                     <Button
                         onClick={onClose}
                         type={"button"}>
@@ -214,7 +221,7 @@ export default function PageArtistMain() {
                         ml={3}
                         onClick={() => onUpdateArt(getValues(["title", "description", "price"]))}
                         isLoading={toggleLoading}>
-                        Save changes
+                        Buy Now
                     </Button>
                 </AlertDialogFooter>
             </AlertDialogContent>

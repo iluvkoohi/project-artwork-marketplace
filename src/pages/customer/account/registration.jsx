@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     Text,
@@ -18,119 +18,89 @@ import {
     AlertDescription,
     useDisclosure,
     ScaleFade,
-    FormControl,
-    useColorMode,
-    InputGroup,
-    InputRightElement,
-    useColorModeValue,
-    Checkbox,
-    useToast
+    FormControl
 } from '@chakra-ui/react';
 
 
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useForm } from "react-hook-form";
-import { avatars } from '../../const/url';
-import { Blur } from '../../const/components';
+import { avatars } from '../../../const/url';
+import { Blur } from '../../../const/components';
 import { useNavigate } from "react-router-dom";
-import { Authentication } from '../../controllers/authenticaiton';
-import { accountState, loadingState } from '../../state/recoilState';
-import { Profile } from '../../controllers/profile';
+import { Authentication } from '../../../controllers/authenticaiton';
+import { accountState, loadingState } from '../../../state/recoilState';
 
-
-
-function PageLogin() {
+function PageCustomerRegistration() {
     const authController = new Authentication();
-    const profileController = new Profile();
-
-    const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm();
-
-    const [togglePassword, setTogglePassword] = useState(false);
-    const [rememberPassword, setRememberPassword] = useState(false);
+    const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm();
 
     const [login, setLogin] = useRecoilState(accountState);
     const [loading, setLoading] = useRecoilState(loadingState);
     const [state, setState] = useState({
-        login: {
+        register: {
             hasError: false,
             message: "",
-        }
+            statusCode: 0,
+        },
+        isPasswordMatched: true,
     });
     const account = useRecoilValue(accountState);
     const navigate = useNavigate();
-    const toast = useToast();
-    const { colorMode, toggleColorMode } = useColorMode();
+
     const size = useBreakpointValue({ base: 'md', md: 'lg' });
     const width = useBreakpointValue({ base: '44px', md: '60px' })
     const height = useBreakpointValue({ base: '44px', md: '60px' });
     const blurWidth = useBreakpointValue({ base: '100%', md: '40vw', lg: '30vw' });
     const blurZIndex = useBreakpointValue({ base: -1, md: -1, lg: 0 });
 
-    const handleTogglePassword = () => setTogglePassword(!togglePassword)
 
 
     const onSubmit = async (data) => {
-        const { email, password } = data;
+        const { email, password, confirm } = data;
+        if (password !== confirm) return setState(prevState => ({
+            ...prevState,
+            isPasswordMatched: false
+        }));
+
         setLoading(true);
-        let login = await authController.login({ email, password });
+        let login = await authController.register({ email, password });
+
         setLoading(false);
         setLogin(login);
 
-        if (login === 400) return setState(prevState => ({
-            ...prevState,
-            login: {
-                hasError: true,
-                message: "Invalid email and/or password"
-            }
-        }));
+        if (login == 400) return setTimeout(function () {
+            setState(prevState => ({
+                ...prevState,
+                isPasswordMatched: true,
+                register: {
+                    hasError: true,
+                    message: `An account with ${email} is already registered, Please try logging in.`,
+                    statusCode: 400,
+                }
+            }))
+        }, 1000);
 
-        if (login === 500) return setState(prevState => ({
-            ...prevState,
-            login: {
-                hasError: true,
-                message: "Sorry, something went wrong. It's not you, It's us"
-            }
-        }));
+        if (login == 500) return setTimeout(function () {
+            setState(prevState => ({
+                ...prevState,
+                isPasswordMatched: true,
+                register: {
+                    hasError: true,
+                    message: "Sorry, something went wrong. It's not you, It's us",
+                    statusCode: 500,
 
-        if (!rememberPassword) {
-            localStorage.removeItem("login");
-        }
-        if (rememberPassword) {
-            localStorage.setItem("login", [email, password]);
-        }
+                }
+            }))
+        }, 1000);
 
-        const profile = await profileController.get();
-        if (profile === 400)
-            return navigate("/artist/profile/create", { replace: true });
-
-        if (!profile.data.account.verified) {
-            return toast({
-                status: "info",
-                description: "Account is under verification",
-                position: "bottom-right"
-            });
-        }
-        return navigate("/artist/main", { replace: true });
-
+        return navigate("/customer/main", { replace: true });
     }
 
     const handleNavigate = () => {
-        navigate("/registration",
+        navigate("/customer/login",
             { replace: true }
         );
     }
-
-    useEffect(() => {
-        const savedCredentials = localStorage.getItem("login");
-        if (savedCredentials) {
-            const value = savedCredentials.split(",");
-            setValue("email", value[0].trim());
-            setValue("password", value[1].trim());
-            setRememberPassword(true);
-        }
-    }, []);
-
-
 
     const registerEmail = {
         ...register("email", {
@@ -140,11 +110,31 @@ function PageLogin() {
             }
         })
     };
+
+    var pattern = new RegExp(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d][A-Za-z\d!@#$%^&*()_+]{7,19}$/);
+
     const registerPassword = {
         ...register("password", {
             required: {
                 value: true,
                 message: "Password is required"
+            },
+            pattern: {
+                value: pattern,
+                message: "Password must contain at least 1 number, 1 special character and SHOULD NOT start with a special character"
+            },
+            minLength: {
+                value: 10,
+                message: "Password minimum length is 10"
+            },
+        })
+    };
+
+    const registerConfirm = {
+        ...register("confirm", {
+            required: {
+                value: true,
+                message: "Confirm Password is required"
             }
         })
     };
@@ -159,13 +149,28 @@ function PageLogin() {
         {errors.password.message}
     </Alert>;
 
-    const loginError = state.login.hasError == true ? <ScaleFade
+    const confirmError = errors.confirm && <Alert status='error' borderRadius={"lg"} color={"black"}>
+        <AlertIcon />
+        {errors.confirm.message}
+    </Alert>;
+
+    const passwordNotMatched = !state.isPasswordMatched && <ScaleFade
         initialScale={0.6}
-        in={state.login.hasError}>
+        in={true}>
 
         <Alert status='error' borderRadius={"lg"} color={"black"}>
             <AlertIcon />
-            <AlertDescription>{state.login.message} </AlertDescription>
+            <AlertDescription>Password not matched</AlertDescription>
+        </Alert>
+    </ScaleFade>;
+
+    const registrationError = state.register.hasError == true ? <ScaleFade
+        initialScale={0.6}
+        in={state.register.hasError}>
+
+        <Alert status='error' borderRadius={"lg"} color={"black"}>
+            <AlertIcon />
+            <AlertDescription>{state.register.message} </AlertDescription>
         </Alert>
     </ScaleFade> : <></>;
 
@@ -181,14 +186,14 @@ function PageLogin() {
                     <Heading
                         lineHeight={1.1}
                         fontSize={{ base: '3xl', sm: '4xl', md: '5xl', lg: '6xl' }}>
-                        Upload&nbsp;
+                        Start your&nbsp;
                         <Text
                             as={'span'}
                             bgGradient="linear(to-r, red.400,pink.400)"
                             bgClip="text">
-                            &
+                            journey
                         </Text>&nbsp;
-                        sell your artwork alongside well-known artists
+                        by creating an account
                     </Heading>
                     <Stack direction={'row'} spacing={4} align={'center'}>
                         <AvatarGroup>
@@ -261,7 +266,7 @@ function PageLogin() {
                             color={'gray.800'}
                             lineHeight={1.1}
                             fontSize={{ base: '2xl', sm: '3xl', md: '4xl' }}>
-                            Join our community
+                            Support our amazing artists
                             <Text
                                 as={'span'}
                                 bgGradient="linear(to-r, red.400,pink.400)"
@@ -270,55 +275,67 @@ function PageLogin() {
                             </Text>
                         </Heading>
                         <Text color={'gray.500'} fontSize={{ base: 'sm', sm: 'md' }}>
-                            We are looking for amazing artists just like you ! Join our community and earn money while doing your hobbies.
+                            View our website's exclusive original art by browsing.
                         </Text>
                     </Stack>
                     <form onSubmit={handleSubmit(onSubmit)} >
                         <FormControl isInvalid={errors.name}>
                             <Box mt={10}>
                                 <Stack spacing={4}>
+                                    <Tooltip
+                                        color={"white"}
+                                        backgroundColor={"red"}
+                                        hasArrow
+                                        label='Email already exist'
+                                        placement='left'
+                                        isOpen={state.register.statusCode == 400}>
+
+
+                                        <Input
+                                            id="email"
+                                            isInvalid={state.register.hasError || errors.email}
+                                            placeholder="Email"
+                                            bg={'gray.100'}
+                                            border={0}
+                                            color={'gray.500'}
+                                            _placeholder={{
+                                                color: 'gray.500',
+                                            }}
+                                            {...registerEmail} />
+                                    </Tooltip>
+                                    {emailError}
                                     <Input
-                                        id="email"
-                                        isInvalid={state.login.hasError || errors.email}
-                                        placeholder="Email"
+                                        id="password"
+
+                                        isInvalid={state.register.hasError || errors.password}
+                                        type={"password"}
+                                        placeholder="Password"
                                         bg={'gray.100'}
                                         border={0}
                                         color={'gray.500'}
                                         _placeholder={{
                                             color: 'gray.500',
                                         }}
-                                        {...registerEmail} />
-                                    {emailError}
-
-                                    <InputGroup size='md'>
-                                        <Input
-                                            id="password"
-                                            isInvalid={state.login.hasError || errors.password}
-                                            type={togglePassword ? 'text' : 'password'}
-                                            placeholder="Password"
-                                            bg={'gray.100'}
-                                            border={0}
-                                            color={'gray.500'}
-                                            _placeholder={{ color: 'gray.500', }}
-                                            {...registerPassword} />
-                                        <InputRightElement width='4.5rem'>
-                                            <Button h='1.75rem' size='sm' onClick={handleTogglePassword} color={useColorModeValue("gray", "gray")} >
-                                                {togglePassword ? 'Hide' : 'Show'}
-                                            </Button>
-                                        </InputRightElement>
-                                    </InputGroup>
-
+                                        {...registerPassword} />
                                     {passwordError}
-                                    {loginError}
 
+                                    <Input
+                                        id="confirm"
 
+                                        isInvalid={state.register.hasError || errors.password}
+                                        type={"password"}
+                                        placeholder="Confirm"
+                                        bg={'gray.100'}
+                                        border={0}
+                                        color={'gray.500'}
+                                        _placeholder={{
+                                            color: 'gray.500',
+                                        }}
+                                        {...registerConfirm} />
+                                    {confirmError}
+                                    {passwordNotMatched}
+                                    {registrationError}
                                 </Stack>
-                                <Checkbox
-                                    colorScheme={"pink"}
-                                    isChecked={rememberPassword}
-                                    onChange={() => setRememberPassword(!rememberPassword)}
-                                    color={useColorModeValue("black", "black")}
-                                    mt={"10"}>Remember me</Checkbox>
                                 <Button
                                     fontFamily={'heading'}
                                     mt={12}
@@ -327,7 +344,7 @@ function PageLogin() {
                                     color={'gray.800'}
                                     type={'button'}
                                     onClick={() => handleNavigate()}>
-                                    Don't have account?
+                                    Already have account?
                                 </Button>
                                 <Button
                                     fontFamily={'heading'}
@@ -339,8 +356,9 @@ function PageLogin() {
                                         bgGradient: 'linear(to-r, red.400,pink.400)',
                                         boxShadow: 'xl',
                                     }}
-                                    type='submit'  >
-                                    Sign in
+                                    type='submit'
+                                    isLoading={isSubmitting}  >
+                                    Create my account
                                 </Button>
                             </Box>
 
@@ -361,4 +379,4 @@ function PageLogin() {
     );
 }
 
-export default PageLogin;
+export default PageCustomerRegistration;

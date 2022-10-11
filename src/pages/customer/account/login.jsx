@@ -30,16 +30,16 @@ import {
 
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useForm } from "react-hook-form";
-import { avatars } from '../../const/url';
-import { Blur } from '../../const/components';
+import { avatars } from '../../../const/url';
+import { Blur } from '../../../const/components';
 import { useNavigate } from "react-router-dom";
-import { Authentication } from '../../controllers/authenticaiton';
-import { accountState, loadingState } from '../../state/recoilState';
-import { Profile } from '../../controllers/profile';
+import { Authentication } from '../../../controllers/authenticaiton';
+import { accountState, loadingState } from '../../../state/recoilState';
+import { Profile } from '../../../controllers/profile';
 
 
 
-function PageLogin() {
+function PageCustomerLogin() {
     const authController = new Authentication();
     const profileController = new Profile();
 
@@ -49,7 +49,7 @@ function PageLogin() {
     const [rememberPassword, setRememberPassword] = useState(false);
 
     const [login, setLogin] = useRecoilState(accountState);
-    const [loading, setLoading] = useRecoilState(loadingState);
+    const [loading, setLoading] = useState(false);
     const [state, setState] = useState({
         login: {
             hasError: false,
@@ -71,9 +71,7 @@ function PageLogin() {
 
     const onSubmit = async (data) => {
         const { email, password } = data;
-        setLoading(true);
         let login = await authController.login({ email, password });
-        setLoading(false);
         setLogin(login);
 
         if (login === 400) return setState(prevState => ({
@@ -93,35 +91,27 @@ function PageLogin() {
         }));
 
         if (!rememberPassword) {
-            localStorage.removeItem("login");
+            localStorage.removeItem("customer-login");
         }
         if (rememberPassword) {
-            localStorage.setItem("login", [email, password]);
+            localStorage.setItem("customer-login", [email, password]);
         }
 
         const profile = await profileController.get();
         if (profile === 400)
-            return navigate("/artist/profile/create", { replace: true });
+            return navigate("/customer/profile/create", { replace: true });
 
-        if (!profile.data.account.verified) {
-            return toast({
-                status: "info",
-                description: "Account is under verification",
-                position: "bottom-right"
-            });
-        }
-        return navigate("/artist/main", { replace: true });
-
+        return navigate("/customer/main", { replace: true });
     }
 
     const handleNavigate = () => {
-        navigate("/registration",
+        navigate("/customer/registration",
             { replace: true }
         );
     }
 
     useEffect(() => {
-        const savedCredentials = localStorage.getItem("login");
+        const savedCredentials = localStorage.getItem("customer-login");
         if (savedCredentials) {
             const value = savedCredentials.split(",");
             setValue("email", value[0].trim());
@@ -181,14 +171,14 @@ function PageLogin() {
                     <Heading
                         lineHeight={1.1}
                         fontSize={{ base: '3xl', sm: '4xl', md: '5xl', lg: '6xl' }}>
-                        Upload&nbsp;
+                        Purchase&nbsp;
                         <Text
                             as={'span'}
                             bgGradient="linear(to-r, red.400,pink.400)"
                             bgClip="text">
-                            &
+                            limited
                         </Text>&nbsp;
-                        sell your artwork alongside well-known artists
+                        edition artworks by well-known artists
                     </Heading>
                     <Stack direction={'row'} spacing={4} align={'center'}>
                         <AvatarGroup>
@@ -261,7 +251,7 @@ function PageLogin() {
                             color={'gray.800'}
                             lineHeight={1.1}
                             fontSize={{ base: '2xl', sm: '3xl', md: '4xl' }}>
-                            Join our community
+                            Support our amazing artists
                             <Text
                                 as={'span'}
                                 bgGradient="linear(to-r, red.400,pink.400)"
@@ -270,7 +260,7 @@ function PageLogin() {
                             </Text>
                         </Heading>
                         <Text color={'gray.500'} fontSize={{ base: 'sm', sm: 'md' }}>
-                            We are looking for amazing artists just like you ! Join our community and earn money while doing your hobbies.
+                            View our website's exclusive original art by browsing.
                         </Text>
                     </Stack>
                     <form onSubmit={handleSubmit(onSubmit)} >
@@ -339,7 +329,8 @@ function PageLogin() {
                                         bgGradient: 'linear(to-r, red.400,pink.400)',
                                         boxShadow: 'xl',
                                     }}
-                                    type='submit'  >
+                                    type='submit'
+                                    isLoading={isSubmitting} >
                                     Sign in
                                 </Button>
                             </Box>
@@ -361,4 +352,4 @@ function PageLogin() {
     );
 }
 
-export default PageLogin;
+export default PageCustomerLogin;

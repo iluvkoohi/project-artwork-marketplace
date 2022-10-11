@@ -22,7 +22,7 @@ import { emptyAvatar } from '../../../const/url';
 
 const Links = ['Dashboard', 'Projects', 'Team'];
 
-function NavbarInEditProfile(props) {
+function NavbarInCustomerEditProfile(props) {
     const { logout, title } = props;
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { colorMode, toggleColorMode } = useColorMode();
@@ -95,4 +95,4 @@ function NavbarInEditProfile(props) {
     );
 }
 
-export default NavbarInEditProfile;
+export default NavbarInCustomerEditProfile;

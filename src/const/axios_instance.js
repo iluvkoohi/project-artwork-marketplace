@@ -6,8 +6,12 @@ const ArtworkMpClient = axios.create({
     withCredentials: true,
     headers: {
         'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
+    },
+    onUploadProgress: (progressEvent) => {
+        console.log(Math.round((progressEvent.loaded * 100) / progressEvent.total));
     }
 });
+
+
 
 export default ArtworkMpClient;
