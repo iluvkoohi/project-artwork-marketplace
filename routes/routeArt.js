@@ -25,7 +25,6 @@ const updateArtValidator = [
     check('availability', 'Availability is required').notEmpty(),
 ];
 const VALIDATOR_PURCHASE = [
-    check('customerAccountId', 'Customer accountId is required').notEmpty(),
     check('artistAccountId', 'Artist accountId is required').notEmpty(),
     check('_artId', 'Art Id is required').notEmpty(),
 ];

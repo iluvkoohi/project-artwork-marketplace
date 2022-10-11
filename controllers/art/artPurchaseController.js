@@ -16,7 +16,10 @@ const art = (req, res) => {
         if (!errors.isEmpty()) return throwError(res, errors.array());
 
         const transactionId = uuidv4();
-        const { customerAccountId, artistAccountId, _artId } = req.body;
+
+
+        const { artistAccountId, _artId } = req.body;
+        const customerAccountId = req.user.data;
 
         if (
             !mongoose.Types.ObjectId.isValid(customerAccountId) ||
