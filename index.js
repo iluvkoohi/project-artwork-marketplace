@@ -14,14 +14,14 @@ try {
     .connect(process.env.CONNECTION_STRING)
     .then(() => console.log("SERVER IS CONNECTED"))
     .catch(() => console.log("SERVER CANNOT CONNECT"));
-  
+
   app.use((req, res, next) => {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
     next();
   });
-  app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5000', "https://project-artwork-marketplace.vercel.app"], credentials: true}));
+  app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5000', "https://project-artwork-marketplace.vercel.app"], credentials: true }));
   app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -34,6 +34,7 @@ try {
   app.use("/api", require("./routes/routeUpload"));
   app.use("/api", require("./routes/routeTicket"));
   app.use("/api", require("./routes/routeValidate"));
+  app.use("/api", require("./routes/routeStripe"));
 
   app.listen(port, () => console.log(`SERVER IS RUNNING ON ${port}`));
 } catch (error) {
