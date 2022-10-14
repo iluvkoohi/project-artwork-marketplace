@@ -11,7 +11,7 @@ const create = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return throwError(res, errors.array());
 
-    let { description,  title, price, address, latitude, longitude } = req.body;
+    let { description, title, price, address, latitude, longitude } = req.body;
 
     const accountId = req.user.data;
     const exclude = { _id: 0, __v: 0, date: 0, contact: 0, gallery: 0, name: 0, accountId: 0, avatar: 0 };
@@ -94,8 +94,8 @@ const getAllArts = (req, res) => {
 }
 
 const getAllArtsByArtist = (req, res) => {
-    const { accountId, availability = true } = req.query;
-    return Art.find({ accountId: mongoose.Types.ObjectId(accountId), availability })
+    const { accountId } = req.query;
+    return Art.find({ accountId: mongoose.Types.ObjectId(accountId) })
         .select({ __v: 0 })
         .sort({ 'date.createdAt': 'desc' })
         .then((value) => res.status(200).json(value))
@@ -119,7 +119,7 @@ const updateArt = async (req, res) => {
         if (!errors.isEmpty()) return throwError(res, errors.array());
 
         let { _id, title, description, availability, price } = req.body;
-   
+
         const update = {
             $set: {
                 title,
