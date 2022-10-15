@@ -113,6 +113,20 @@ const getAll = (req, res) => {
     }
 }
 
+const getMyOrders = (req, res) => {
+    try {
+        const accountId = req.user.data;
+        return Billing.find({ accountId })
+            .sort({ "date.createdAt": "desc" }) // filter by date
+            .select({ __v: 0, _id: 0 }) // Do not return _id and __v
+            .then((value) => res.status(200).json(value))
+            .catch((err) => res.status(400).json(err));
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
 const getByCustomers = (req, res) => {
     try {
         const accountId = req.params.id;
@@ -159,5 +173,6 @@ module.exports = {
     getByCustomers,
     getByArtist,
     getAll,
-    getByTxnId
+    getByTxnId,
+    getMyOrders
 }

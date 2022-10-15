@@ -68,6 +68,11 @@ router.post("/art/purchase",
     (req, res) => purchase.art(req, res));
 
 
+router.get("/art/purchase",
+    isAuthenticated,
+    (req, res) => purchase.getMyOrders(req, res));
+
+
 router.get("/art/purchase/s/:id",
     isAuthenticated,
     (req, res) => purchase.getByTxnId(req, res));
