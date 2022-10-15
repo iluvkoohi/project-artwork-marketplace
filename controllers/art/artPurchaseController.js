@@ -116,7 +116,7 @@ const getAll = (req, res) => {
 const getMyOrders = (req, res) => {
     try {
         const accountId = req.user.data;
-        return Billing.find({ accountId })
+        return Billing.find({ "header.customer.accountId": accountId })
             .sort({ "date.createdAt": "desc" }) // filter by date
             .select({ __v: 0, _id: 0 }) // Do not return _id and __v
             .then((value) => res.status(200).json(value))
