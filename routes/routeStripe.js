@@ -8,7 +8,7 @@ router.post("/stripe", async (req, res) => {
     try {
         const { name, image, amount, profile } = req.body;
 
-        const payment = await new Payment({ profile, description: name }).save()
+        const payment = await new Payment({ profile, amount, description: name }).save()
         const items = [
             {
                 price_data: {
