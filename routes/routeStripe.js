@@ -38,6 +38,7 @@ router.post("/stripe", async (req, res) => {
 router.get("/stripe/payments", async (req, res) => {
     try {
         return Payment.find({})
+            .sort({ "date.createdAt": "asc" }) // filter by date
             .then((value) => res.status(200).json(value))
             .catch(err => res.status(400).json(err))
     } catch (error) {

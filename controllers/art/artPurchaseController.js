@@ -145,7 +145,7 @@ const getByArtist = (req, res) => {
     try {
         const accountId = req.params.id;
         return Billing.find({ "header.artist.accountId": accountId })
-            .sort({ "date.createdAt": "desc" }) // filter by date
+            .sort({ "date.createdAt": "asc" }) // filter by date
             .select({ __v: 0, _id: 0 }) // Do not return _id and __v
             .then((value) => res.status(200).json(value))
             .catch((err) => res.status(400).json(err));
