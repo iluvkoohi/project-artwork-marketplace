@@ -21,7 +21,7 @@ try {
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
     next();
   });
-  app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5000', "https://project-artwork-marketplace.vercel.app"], credentials: true }));
+  app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5000', 'https://artwork-marketplace-v1.netlify.app', "https://project-artwork-marketplace.vercel.app"], credentials: true }));
   app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
