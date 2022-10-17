@@ -63,7 +63,7 @@ const getAllArts = (req, res) => {
     const { latitude, longitude, availability = true, sortBy } = req.query;
 
     if (latitude != undefined && longitude != undefined)
-        return Art.find({ availability })
+        return Art.find({  })
             .select({ __v: 0 })
             .sort({ 'date.createdAt': 'desc' })
             .then((value) => {
@@ -87,7 +87,7 @@ const getAllArts = (req, res) => {
             })
             .catch((err) => throwError(res, err));
 
-    return Art.find({ availability })
+    return Art.find({  })
         .select({ _id: 0, __v: 0, 'address.coordinates': 0 })
         .sort({ 'date.createdAt': 'desc' })
         .then((value) => res.status(200).json(value))
