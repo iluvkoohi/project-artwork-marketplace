@@ -21,16 +21,25 @@ try {
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
     next();
   });
-  app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5000', 'https://artwork-marketplace-v1.netlify.app', "https://project-artwork-marketplace.vercel.app"], credentials: true }));
+
+  app.use(cors({
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5000',
+      'https://artwork-marketplace-v1.netlify.app',
+      "https://project-artwork-marketplace.vercel.app"
+    ],
+    credentials: true
+  }));
+
   app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  app.use(multer({ storage, fileFilter }).array("images"));
+  app.use(multer({ storage, fileFilter }).array("media"));
 
   app.use("/api", require("./routes/routeUser"));
   app.use("/api", require("./routes/routeProfile"));
   app.use("/api", require("./routes/routeArt"));
-  app.use("/api", require("./routes/routeMonetization"));
   app.use("/api", require("./routes/routeUpload"));
   app.use("/api", require("./routes/routeTicket"));
   app.use("/api", require("./routes/routeValidate"));

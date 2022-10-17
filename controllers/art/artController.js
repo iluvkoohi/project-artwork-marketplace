@@ -11,7 +11,7 @@ const create = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return throwError(res, errors.array());
 
-    let { description, title, price, address, latitude, longitude } = req.body;
+    let { description, title, price, videoUrl } = req.body;
 
     const accountId = req.user.data;
     const exclude = { _id: 0, __v: 0, date: 0, contact: 0, gallery: 0, name: 0, accountId: 0, avatar: 0 };
@@ -49,6 +49,7 @@ const create = async (req, res) => {
         images,
         title,
         description,
+        videoUrl,
         price: parseFloat(price),
         address: profile.address,
     })

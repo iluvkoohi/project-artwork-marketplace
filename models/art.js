@@ -49,6 +49,10 @@ const ArtSchema = new Schema({
         required: [true, "description is required"],
     },
     images: [ImageSchema],
+    videoUrl: {
+        type: String,
+        required: [true, "video URL is required"],
+    },
     date: {
         createdAt: {
             type: Date,
