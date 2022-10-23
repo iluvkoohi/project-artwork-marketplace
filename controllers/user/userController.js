@@ -5,11 +5,13 @@ const { throwError } = require("../../const/status");
 const { validationResult } = require('express-validator');
 
 const User = require("../../models/user");
+const { Profile } = require("../../models/profile");
+
 const SALT_ROUNDS = 12;
 //const MAX_AGE = 60 * 60 * 24 * 7;
 const cookieOptions = {
     httpOnly: true,
-   // maxAge: MAX_AGE,
+    // maxAge: MAX_AGE,
     sameSite: process.env.NODE_ENV === 'production' && "none",
     secure: process.env.NODE_ENV === 'production',
 };
@@ -61,6 +63,7 @@ const login = async (req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) return throwError(res, { message: "email and/or password is incorrect" });
+
 
         await bcrypt.compare(password, user.hashValue, function (err, result) {
             if (err) return throwError(res, { message: "email and/or password is incorrect" });

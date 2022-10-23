@@ -1,9 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const { isAuthenticated } = require("../middleware/authentication");
+const { isAuthorized } = require("../middleware/authorization");
+
 const { check } = require('express-validator');
 
 const art = require("../controllers/art/artController");
+
 const purchase = require("../controllers/art/artPurchaseController");
 
 const artValidator = [
@@ -31,62 +34,87 @@ const VALIDATOR_PURCHASE = [
 
 router.post("/art",
     isAuthenticated,
+    isAuthorized,
     artValidator,
     (req, res) => art.create(req, res));
 
 router.get("/arts",
     isAuthenticated,
+    isAuthorized,
     (req, res) => art.getAllArts(req, res));
 
 router.get("/arts/by-artists",
     isAuthenticated,
     (req, res) => art.getAllArtsByArtist(req, res));
 
+router.get("/arts/by-category",
+    isAuthenticated,
+    (req, res) => art.getAllArtsByCategory(req, res));
+
 router.get("/art/s/:id",
     isAuthenticated,
+    isAuthorized,
     (req, res) => art.getById(req, res));
 
 router.put("/art/update",
     isAuthenticated,
-    updateArtValidator,
+    isAuthorized, updateArtValidator,
     (req, res) => art.updateArt(req, res));
 
 router.put("/art/update/image",
     isAuthenticated,
-    updateArtImagesValidator,
+    isAuthorized, updateArtImagesValidator,
     (req, res) => art.updateArtImages(req, res));
 
 router.delete("/art/:id",
     isAuthenticated,
+    isAuthorized,
     (req, res) => art.remove(req, res));
+
+// ART CATEGORIES
+router.post("/art/category",
+    isAuthenticated,
+    isAuthorized,
+    artValidator,
+    (req, res) => art.createCategory(req, res));
+
+router.get("/art/category",
+    isAuthenticated,
+    isAuthorized,
+    (req, res) => art.getCategories(req, res));
+
+
+router.delete("/art/category/:categoryId",
+    isAuthenticated,
+    isAuthorized,
+    (req, res) => art.deleteCategory(req, res));
 
 
 // PURCHASE
-router.post("/art/purchase",
+router.post("/art/checkout",
     isAuthenticated,
-    VALIDATOR_PURCHASE,
+    isAuthorized,
     (req, res) => purchase.art(req, res));
 
 
-router.get("/art/purchase",
+router.get("/art/checkout/s/:id",
     isAuthenticated,
-    (req, res) => purchase.getMyOrders(req, res));
-
-
-router.get("/art/purchase/s/:id",
-    isAuthenticated,
+    isAuthorized,
     (req, res) => purchase.getByTxnId(req, res));
 
-router.get("/art/purchase/all",
+router.get("/art/checkout/all",
     isAuthenticated,
+    isAuthorized,
     (req, res) => purchase.getAll(req, res));
 
-router.get("/art/purchase/customer/:id",
+router.get("/art/checkout/customer",
     isAuthenticated,
+    isAuthorized,
     (req, res) => purchase.getByCustomers(req, res));
 
-router.get("/art/purchase/artist/:id",
+router.get("/art/checkout/artist",
     isAuthenticated,
+    isAuthorized,
     (req, res) => purchase.getByArtist(req, res));
 
 module.exports = router;

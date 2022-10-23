@@ -12,9 +12,9 @@ const VerificationSchema = new Schema({
         type: mongoose.SchemaTypes.ObjectId,
         required: [true, "accountId is required"],
     },
-    photoUrl: {
+    url: {
         type: String,
-        required: [true, "Photo url is required"],
+        required: [true, "url url is required"],
     },
     profile: {
         type: {},

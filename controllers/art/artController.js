@@ -4,14 +4,17 @@ const fs = require("fs");
 const Art = require("../../models/art");
 const distanceBetween = require("../../helpers/distanceBetween");
 const { Profile } = require("../../models/profile");
+const ArtCategory = require("../../models/art-categories");
+
 const { throwError } = require("../../const/status");
 const { validationResult } = require('express-validator');
+const MONETIZATION_PERCENT = process.env.MONETIZATION;
 
 const create = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return throwError(res, errors.array());
 
-    let { description, title, price, videoUrl } = req.body;
+    let { description, title, price, videoUrl, category } = req.body;
 
     const accountId = req.user.data;
     const exclude = { _id: 0, __v: 0, date: 0, contact: 0, gallery: 0, name: 0, accountId: 0, avatar: 0 };
@@ -50,7 +53,8 @@ const create = async (req, res) => {
         title,
         description,
         videoUrl,
-        price: parseFloat(price),
+        category,
+        price,
         address: profile.address,
     })
         .save()
@@ -58,12 +62,35 @@ const create = async (req, res) => {
         .catch((err) => throwError(res, err));
 }
 
+
+const createCategory = async (req, res) => {
+    return new ArtCategory(req.body)
+        .save()
+        .then((value) => res.status(200).json(value))
+        .catch((err) => res.status(400).json(err))
+}
+
+const getCategories = async (req, res) => {
+    return ArtCategory.find({})
+        .then((value) => res.status(200).json(value))
+        .catch((err) => res.status(400).json(err))
+}
+
+
+const deleteCategory = async (req, res) => {
+    const categoryId = req.params.categoryId;
+    return ArtCategory.findByIdAndDelete(categoryId)
+        .then((value) => res.status(200).json(value))
+        .catch((err) => res.status(400).json(err))
+}
+
+
 const getAllArts = (req, res) => {
 
     const { latitude, longitude, availability = true, sortBy } = req.query;
 
     if (latitude != undefined && longitude != undefined)
-        return Art.find({  })
+        return Art.find({})
             .select({ __v: 0 })
             .sort({ 'date.createdAt': 'desc' })
             .then((value) => {
@@ -87,12 +114,24 @@ const getAllArts = (req, res) => {
             })
             .catch((err) => throwError(res, err));
 
-    return Art.find({  })
+    return Art.find({})
         .select({ _id: 0, __v: 0, 'address.coordinates': 0 })
         .sort({ 'date.createdAt': 'desc' })
         .then((value) => res.status(200).json(value))
         .catch((err) => throwError(res, err));
 }
+
+const getAllArtsByCategory = (req, res) => {
+
+    const { category, availability = true } = req.query;
+
+    return Art.find({ category })
+        .select({ _id: 0, __v: 0, 'address.coordinates': 0 })
+        .sort({ 'date.createdAt': 'desc' })
+        .then((value) => res.status(200).json(value))
+        .catch((err) => throwError(res, err));
+}
+
 
 const getAllArtsByArtist = (req, res) => {
     const { accountId } = req.query;
@@ -195,5 +234,9 @@ module.exports = {
     getById,
     updateArt,
     updateArtImages,
-    remove
+    remove,
+    getAllArtsByCategory,
+    createCategory,
+    getCategories,
+    deleteCategory
 }

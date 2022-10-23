@@ -84,6 +84,11 @@ const BillingSchema = new Schema({
             type: Date,
         },
     },
+    status: {
+        type: String,
+        enum: ["pending", "packed", "shipped", "to-deliver", "delivered"],
+        default: "pending"
+    },
 }, options)
 
 module.exports = Billing = mongoose.model("billings", BillingSchema);

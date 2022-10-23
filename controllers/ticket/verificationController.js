@@ -10,34 +10,12 @@ const { throwError } = require("../../const/status");
 const create = async (req, res) => {
     try {
         const accountId = req.user.data;
-
+        const profile = req.profile;
+        console.log(profile)
         const ticket = await Verification.findOne({ accountId });
-        if (ticket)
-            return throwError(res, { message: "cannot re-submit ticket" });
 
-        const profile = await Profile
-            .findOne({ accountId })
-            .select({ __v: 0, _id: 0, accountId: 0, account: 0, gallery: 0 });
+        if (ticket) return throwError(res, { message: "cannot re-submit ticket" });
 
-        if (profile == null)
-            return throwError(res, { message: "Profile not found" });
-
-        const urls = [];
-        const files = req.files;
-        const cloudOptions = {
-            folder: process.env.CLOUDINARY_FOLDER + "/tickets/verification",
-            unique_filename: true
-        };
-
-        for (const file of files) {
-            const { path } = file;
-            const upload = await cloudinary.uploader.upload(path, cloudOptions);
-            urls.push(upload.url);
-            fs.unlinkSync(path);
-            break;
-        }
-
-        req.body.photoUrl = urls[0];
         req.body.accountId = accountId;
         req.body.profile = profile;
         return new Verification(req.body)

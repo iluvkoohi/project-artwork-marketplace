@@ -44,6 +44,8 @@ try {
   app.use("/api", require("./routes/routeTicket"));
   app.use("/api", require("./routes/routeValidate"));
   app.use("/api", require("./routes/routeStripe"));
+  app.use("/api", require("./controllers/cartController"));
+  app.use("/api", require("./controllers/statusController"));
 
   app.listen(port, () => console.log(`SERVER IS RUNNING ON ${port}`));
 } catch (error) {

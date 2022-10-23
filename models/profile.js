@@ -74,10 +74,6 @@ const ProfileSchema = new Schema({
       type: Boolean,
       default: false,
     },
-    authorization: {
-      type: Boolean,
-      default: false,
-    },
     role: {
       type: String,
       enum: userRoles,

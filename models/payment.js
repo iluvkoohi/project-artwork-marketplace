@@ -1,6 +1,12 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const options = {
+    // capped: { size: 1024 },
+    // bufferCommands: false,
+    autoCreate: false
+};
+
 const PaymentSchema = new Schema({
     profile: {},
     amount: {
@@ -17,6 +23,6 @@ const PaymentSchema = new Schema({
             default: Date.now
         }
     }
-});
+}, options);
 
 module.exports = Payment = mongoose.model("monthly-payments", PaymentSchema);
