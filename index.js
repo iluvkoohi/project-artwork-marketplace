@@ -27,7 +27,8 @@ try {
       'http://localhost:3000',
       'http://localhost:5000',
       'https://artwork-marketplace-v1.netlify.app',
-      "https://project-artwork-marketplace.vercel.app"
+      "https://project-artwork-marketplace.vercel.app",
+      "https://test-artworkmarketplace-api.herokuapp.com"
     ],
     credentials: true
   }));
