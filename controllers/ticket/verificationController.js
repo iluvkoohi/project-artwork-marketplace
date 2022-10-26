@@ -4,7 +4,7 @@ const cloudinary = require("../../services/img-upload/cloundinary");
 const Verification = require("../../models/ticket");
 const { Profile } = require("../../models/profile");
 const { throwError } = require("../../const/status");
-
+const nodemailer = require("nodemailer");
 
 // POST
 const create = async (req, res) => {
@@ -65,6 +65,11 @@ const getByAccountId = (req, res) => {
 // UPDATE
 const updateProfileVerificationStatus = async (req, res) => {
     try {
+        // const { from, to, message } = req.body
+
+
+
+
         const { ticketId, accountId, ticketStatus, accountVerified } = req.body;
 
         const update = {
@@ -81,7 +86,44 @@ const updateProfileVerificationStatus = async (req, res) => {
         const updateTicket = await Verification
             .findByIdAndUpdate(ticketId, { status: ticketStatus }, options);
 
-        return res.status(200).json({ updateProfile, updateTicket });
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'artwork.marketplace.ph@gmail.com',
+                pass: 'krkjrwbnvhwazfyw'
+            }
+        })
+
+        const email = await transporter.sendMail({
+            from: '"Artwork Marketplace" <artwork.marketplace.ph@gmail.com>',
+            to: updateProfile.contact.email,
+            subject: "ACCOUNT VERIFICATION",
+            text: "Congratulations",
+            sender: "artwork.marketplace.ph@gmail.com",
+            envelope: {
+                from: "artwork.marketplace.ph@gmail.com",
+                to: updateProfile.contact.email,
+            },
+            html: `<!DOCTYPE html>
+                <html>
+                  <head>
+                    <meta charset="utf-8">
+                  </head>
+                  <body>
+                    <br/>
+                    <img src="https://webstockreview.net/images/congratulations-clipart-kid-2.png" alt="Image"/>
+                    <h1 style='color:#4E8408; font-size: 32px;'>Congratulations, ${updateProfile.name.first}!</h1>
+                    <p style='color: black; font-size: 18px;'>
+                    You successfully completed the verification. <br/>Your Artwork Marketplace account is now allowed for buying and selling. <br/><br/>
+                    Best, <br/>
+                    Artwork Marketplace Admin
+                    </p>
+                  </body>
+                </html>`
+        })
+
+
+        return res.status(200).json({ updateProfile, email, updateTicket });
 
     } catch (error) {
         return res.status(200).json(error);
